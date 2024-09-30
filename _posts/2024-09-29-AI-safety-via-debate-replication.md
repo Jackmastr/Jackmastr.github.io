@@ -1,7 +1,7 @@
 ## Paper Replication: AI Safety via Debate - Convincing a Sparse Classifier
 
 In this post I will go through my current progress in replicating the "convincing a sparse classifier" experiment in Section 3.1 of _AI safety via debate_ (Irving, Christiano, and Amodei 2018).
-I haven't fully achieved this goal but I'm posting my current status as my project submission for the Summer 2024 installment of the _AI Safety Fundamentals_ course by BlueDot. [Here](https://github.com/Jackmastr/debate-game-replication) is a link to my github repository where I am still working on it.
+I haven't fully achieved this goal but I'm posting my current status as my project submission for the Summer 2024 installment of the _AI Safety Fundamentals_ course by BlueDot. [Here](https://github.com/Jackmastr/debate-game-replication) is a link to my github repository where I am still working on it. My current status as of the time of this post is I think I have the judge implemented correctly, and am getting similar test accuracy on random pixels in the 4 and 6 case. I've also created a version of Figure 3(a), showing the behvior of the judges errors on random input, that matches closely with the original paper. I've currently made a lot of progress on the debate agents (which use Monte Carlo Tree Search), however I'm not quite there yet and need more time to test and run them.
 
 To be a complete replication my goal was to approximately remake most of the same figures and arrive at nearly the same results quoted in that section. To wit, that meant:
 1. Figure 2 ![Figure 2](../images/AI_safety_via_debate_fig2.png)
@@ -20,3 +20,25 @@ Now let's break this down into actionable parts.
 2. Next we need to reproduce the architecture used in the relevant TensorFlow MNIST layers tutorial (with a small tweak in what it takes as input). A link to this is included as a footnote in the original paper. The link is currently dead but the Wayback Machine contains an archive of the original tutorial here: [Captured May 18 2018](https://web.archive.org/web/20180516102820/https://www.tensorflow.org/tutorials/layers#building_the_cnn_mnist_classifier).
 3. We train the judges using the additional information provided. The optimizer is Adam, the learning rate is $10^{−4}$, the batch size is 128 samples, the number of batches is 30k in the 6 pixel case and 50k in the 4 pixel case.
 4. We assess the judges accuracy on the test set, hopefully similar to 59.4% (48.2%) in the 6 (4) pixel case.
+
+### Section 1.1 - Preprocessing the Images
+To start off I will be using the `pytorch` python package instead of `tensorflow` for the most part since I have a little bit of familiarity from doing the beginning lessons of the [Alignment Research Engineer Accelerator (ARENA) course](https://www.arena.education/). To help me (besides the usual answers you can find googling) I made use of Anthropic's Claude and OpenAI's ChatGPT either on their own or through the AI code editor Cursor. There were a number of other replications or partial replications I came across online most notably https://www.alignmentforum.org/posts/5Kv2qNfRyXXihNrx2/ai-safety-debate-and-its-applications that I consulted although I wanted to keep the implementation mine at the end of the day.
+
+Getting that out of the way, this the way I went about loading and preprocessing the MNIST images. I defined a function that masks all but `num_pixels` nonzero pixels in the image. In some cases I see normalization applied to the pixel values to improve training. That may help here but the usual normalization I see applied is not right, the statistics that come from selecting a few nonzero pixels aren't the same as those of the full images.
+```python
+from torchvision import datasets, transforms
+# Define transforms
+transform = transforms.Compose([
+    transforms.ToTensor(),
+    MaskAllButNPixels(num_pixels)
+])
+
+# Load MNIST dataset
+train_dataset = datasets.MNIST(
+    root='./data', train=True, download=True, transform=transform)
+test_dataset = datasets.MNIST(
+    root='./data', train=False, download=True, transform=transform
+```
+In defining the transforming you need to be careful. Remember we want the output of the preprossing step to be formated like `[mask, image]` and the random pixels should be chosen without replacement and **only** be selected from the **nonzero** pixels in the image. With that done we can move on to the second step.
+### Section 1.2 - Implementing the Neural Network
+
