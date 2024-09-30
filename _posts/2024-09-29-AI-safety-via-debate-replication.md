@@ -85,3 +85,19 @@ OK. So now the (first) moment of truth. Did these model give roughly the same ac
 
 It's not in the original paper but here is the version for 4 pixels: ![my version](/images/error_matrix4.png)
 In the text it's refered to as a "confusion matrix" although I'm not sure that always means the same thing to different authors. To be more explicit: the percentage in each square is the percentage of **all** images in the test dataset with that true label and that predicted label. If you summed the value in every square (including the hidden numbers along the diagonal) it adds up to 100%.
+
+## Section 2 - Implementing The Debate Agents (Monte Carlo Tree Search)
+As of the time of submitting this blog post I haven't ironed out the kinks in my implementation. However I have made some progress and I'll explain where I am at so far. Like in Section 1, let's begin from the text of the paper itself:
+> The MNIST debate game is simple enough that we can play it with pure Monte Carlo Tree Search
+[[Coulom, 2006]](https://doi.org/10.1007/978-3-540-75538-8_7) without training a heuristic as in [Silver et al. [2017a]](https://doi.org/10.1038/nature24270). We use 10k rollouts per move,
+where each rollout descends to a leaf for evaluation using the judge. During rollouts, we select nodes
+to expand using the PUCT variant in [Silver et al. [2017a]](https://doi.org/10.1038/nature24270): at node s we pick action a to maximize
+>
+> 
+$$U(s, a) = c_\text{puct}P
+\frac{\sqrt{\sum_b N(s,b)}}{1 + N(s,a)}$$
+>
+>
+>where cpuct = 1, P = 1/(#nonzero pixels) is constant since we do not train a heuristic, and N(s, a)
+is the visit count. Ties are broken randomly. We play out games by choosing moves with the highest
+visit count. To model precommit, we play 9 different games for the same image with the 9 possible
