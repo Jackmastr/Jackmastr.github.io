@@ -4,7 +4,7 @@ In this post I will go through my current progress in replicating the "convincin
 I haven't fully achieved this goal but I'm posting my current status as my project submission for the Summer 2024 installment of the _AI Safety Fundamentals_ course by BlueDot. [Here](https://github.com/Jackmastr/debate-game-replication) is a link to my github repository where I am still working on it. My current status as of the time of this post is I think I have the judge implemented correctly, and am getting similar test accuracy on random pixels in the 4 and 6 case. I've also created a version of Figure 3(a), showing the behvior of the judges errors on random input, that matches closely with the original paper. I've currently made a lot of progress on the debate agents (which use Monte Carlo Tree Search), however I'm not quite there yet and need more time to test and run them.
 
 To be a complete replication my goal was to approximately remake most of the same figures and arrive at nearly the same results quoted in that section. To wit, that meant:
-1. Figure 2 ![Figure 2](../images/AI_safety_via_debate_fig2.png)
+1. Figure 2 ![Figure 2](/../images/AI_safety_via_debate_fig2.png)
 2. Table 2 ![Table 2](https://github.com/Jackmastr/Jackmastr.github.io/blob/main/images/AI_safety_via_debate_tab2.png)
 3. Figure 3 ![Figure 3](../images/AI_safety_via_debate_fig3.png)
 4. Figure 4 ![Figure 4](../images/AI_safety_via_debate_fig4.png)
