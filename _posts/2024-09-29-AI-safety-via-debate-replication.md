@@ -41,4 +41,39 @@ test_dataset = datasets.MNIST(
 ```
 In defining the transforming you need to be careful. Remember we want the output of the preprossing step to be formated like `[mask, image]` and the random pixels should be chosen without replacement and **only** be selected from the **nonzero** pixels in the image. With that done we can move on to the second step.
 ### Section 1.2 - Implementing the Neural Network
+From the TensorFlow Tutorial:
+>Convolutional Layer #1: Applies 32 5x5 filters (extracting 5x5-pixel subregions), with ReLU activation function
+Pooling Layer #1: Performs max pooling with a 2x2 filter and stride of 2 (which specifies that pooled regions do not overlap)
+Convolutional Layer #2: Applies 64 5x5 filters, with ReLU activation function
+Pooling Layer #2: Again, performs max pooling with a 2x2 filter and stride of 2
+Dense Layer #1: 1,024 neurons, with dropout regularization rate of 0.4 (probability of 0.4 that any given element will be dropped during training)
+Dense Layer #2 (Logits Layer): 10 neurons, one for each digit target class (0–9).
 
+My implementation for reference:
+```python
+class Net(nn.Module):
+    def __init__(self):
+        super(Net, self).__init__()
+        self.conv1 = nn.Conv2d(2, 32, kernel_size=5, padding=2)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=5, padding=2)
+        self.fc1 = nn.Linear(64 * 7 * 7, 1024)
+        self.dropout = nn.Dropout(0.4)
+        self.fc2 = nn.Linear(1024, 10)
+
+    def forward(self, x):
+        # 1. Convolutional Layer #1: Applies 32 5x5 filters (extracting 5x5-pixel subregions), with ReLU activation function
+        x = torch.relu(self.conv1(x))
+        # 2. Pooling Layer #1: Performs max pooling with a 2x2 filter and stride of 2 (which specifies that pooled regions do not overlap)
+        x = nn.functional.max_pool2d(x, kernel_size=2, stride=2)
+        # 3. Convolutional Layer #2: Applies 64 5x5 filters, with ReLU activation function
+        x = torch.relu(self.conv2(x))
+        # 4. Pooling Layer #2: Again, performs max pooling with a 2x2 filter and stride of 2
+        x = nn.functional.max_pool2d(x, kernel_size=2, stride=2)
+        x = x.view(-1, 64 * 7 * 7)
+        # 5. Dense Layer #1: 1,024 neurons, with dropout regularization rate of 0.4 (probability of 0.4 that any given element will be dropped during training)
+        x = torch.relu(self.fc1(x))
+        x = self.dropout(x)
+        # 6. Dense Layer #2 (Logits Layer): 10 neurons, one for each digit target class (0–9).
+        x = self.fc2(x)
+        return x
+```
