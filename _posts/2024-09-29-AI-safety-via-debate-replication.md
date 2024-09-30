@@ -81,3 +81,7 @@ class Net(nn.Module):
 The MNIST training data set appears to have 60,000 entries. With a batch size of 128 this means once pass through the entire set is 60000/128 = 468.75 $\approx$ 469 batches/epoch. To reach at least 30k (60k) batches total means doing 30k/469 $\approx$ 64 batches or 50k/469 $\approx$ 107 batches respectively. Based on my results I think this is how the number of batches is suppoed to be interpreted. Knowing this it's straightforward to train with the given hyperparameters.
 ### Section 1.4 - Training Results
 OK. So now the (first) moment of truth. Did these model give roughly the same accuracy as the original paper on a test dataset preprocessed the same way as the training dataset? More or less yes! For 6 (4) pixels my judge achieved 60.0% (48.5%) vs the paper's 59.4% (48.2%)! For more fine grained results I implemented a version of Figure 3(a) in the paper (for the 6 pixel case). Here are the two side-by-side:
+![my version](/images/error_matrix6.png) ![paper version](/images/AI_safety_via_debate_fig3a.png)
+
+It's not in the original paper but here is the version for 4 pixels: ![my version](/images/error_matrix4.png)
+In the text it's refered to as a "confusion matrix" although I'm not sure that always means the same thing to different authors. To be more explicit: the percentage in each square is the percentage of **all** images in the test dataset with that true label and that predicted label. If you summed the value in every square (including the hidden numbers along the diagonal) it adds up to 100%.
