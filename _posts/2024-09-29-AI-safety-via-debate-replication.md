@@ -112,4 +112,4 @@ human knowledge_. From what I can tell the MCTS algorithm has a few main compone
 
 This procedure can be quite slow for the number of images and repeats of the process per image (the paper recommends 10k rollouts). LLM suggestions helped me make some optimizations here and there that sped up my runtime but not a huge amount. What remains is to see if this reproduces the original results. As an intermediate test case I wanted to see if the agents made choices randomly, using only 1 rollout so it would proceed faster, the results of the judge would look like the random test case of the previous section. So far it doesn't seem like that matches though. I'm not sure at this point if that indicates a fundamental flaw in my implementation or if I need to still perform a high number of rollouts or change how the score is updated in the random simulation.
 
-That's where I'm at so far.
+That's where I'm at so far. Look for future updates on this github blog and maybe check out the [github repo for this project](https://github.com/Jackmastr/debate-game-replication/tree/main), although it will be a bit confusing and messy for now and the near future.
