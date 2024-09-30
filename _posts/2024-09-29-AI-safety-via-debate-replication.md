@@ -94,10 +94,20 @@ where each rollout descends to a leaf for evaluation using the judge. During rol
 to expand using the PUCT variant in [Silver et al. [2017a]](https://doi.org/10.1038/nature24270): at node s we pick action a to maximize
 >
 > 
-$$U(s, a) = c_\text{puct}P
-\frac{\sqrt{\sum_b N(s,b)}}{1 + N(s,a)}$$
+$$U(s, a) = c_\text{puct}P\frac{\sqrt{\sum_b N(s,b)}}{1 + N(s,a)}$$
+>
 >
 >
 >where cpuct = 1, P = 1/(#nonzero pixels) is constant since we do not train a heuristic, and N(s, a)
 is the visit count. Ties are broken randomly. We play out games by choosing moves with the highest
 visit count. To model precommit, we play 9 different games for the same image with the 9 possible
+
+Now this becomes a little more complicated. It pulls in ideas from a couple additonal papers related to Monte Carlo Tree Search (MCTS). As described the implementation should be similar to [Silver et al. [2017a]](https://doi.org/10.1038/nature24270) aka _Mastering the game of Go without
+human knowledge_. From what I can tell the MCTS algorithm has a few main components in carrying out its goal to search for the best action to take:
+1. Selection: Start at the current state of the game. Consider all the possible moves that could be made from this state. Explore further the action that has the highest score (ties broken randomly). Repeat until reaching a never-before-seen state or there are no more legal moves to make (you are at the end of the game). The score is set up to balance exploring the possibility space and choosing a move that already looks good.
+2. Expansion: When the search reaches a game state that has not yet been seen, mark it as seen and note down all the possible moves from this state.
+3. Simulation: From the newly expanded state make moves randomly until you reach the end of the game and see what the final score is.
+4. Backpropagation: update the score of all the moves along the path you just took, informed by the final score of the game.
+5. Repeat this process many times, then pick the next move with what you found the best score to be.
+
+This procedure can be quite slow for the number of images and repeats of the process per image (the paper recommends 10k rollouts). What remains is to see if this reproduces the original results. As an intermediate test case I wanted to see if the agents made choices randomly, using only 1 rollout so it would proceed faster, the results of the judge would look like the random test case of the previous section. So far it doesn't seem like that matches though. I'm not sure at this point if that indicates a fundamental flaw in my implementation or if I need to still perform a high number of rollouts or change how the score is updated in the random simulation.
